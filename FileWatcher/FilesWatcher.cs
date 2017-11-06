@@ -18,6 +18,7 @@ namespace FileWatcher
         public event EventHandler<FileEventArgs> FileFoundEvent;
         public event EventHandler<RuleMatchingEventArgs> RuleCheckedEvent;
         public event EventHandler<MovingEventArgs> FileMovedEvent;
+        public event EventHandler<MovingEventArgs> FileAlreadyExistsEvent;
 
         public FilesWatcher(List<string> directories, List<FileMovingRule> rules, string defaultFolder)
         {
@@ -53,14 +54,28 @@ namespace FileWatcher
                 });
                 var target = movingRule.TargetDirectory +
                              BuildFileName(e.Name, movingRule.IsSerialNumber, movingRule.IsDateMoving);
-                File.Move(e.FullPath, target);
-                OnRaiseFileMovedEvent(new MovingEventArgs { Directory = target });
+                if (File.Exists(target))
+                {
+                    OnRaiseFileAlreadyExistsEvent(new MovingEventArgs { Directory = target });
+                }
+                else
+                {
+                    File.Move(e.FullPath, target);
+                    OnRaiseFileMovedEvent(new MovingEventArgs { Directory = target });
+                }
             }
             else
             {
                 OnRaiseRuleCheckedEvent(new RuleMatchingEventArgs{ IsMatched = true });
-                File.Move(e.FullPath, defaultFolder + e.Name);
-                OnRaiseFileMovedEvent(new MovingEventArgs { Directory = defaultFolder + e.Name });
+                if (File.Exists(defaultFolder + e.Name))
+                {
+                    OnRaiseFileAlreadyExistsEvent(new MovingEventArgs {Directory = defaultFolder + e.Name });
+                }
+                else
+                {
+                    File.Move(e.FullPath, defaultFolder + e.Name);
+                    OnRaiseFileMovedEvent(new MovingEventArgs {Directory = defaultFolder + e.Name});
+                }
             }
         }
 
@@ -93,6 +108,11 @@ namespace FileWatcher
         protected virtual void OnRaiseRuleCheckedEvent(RuleMatchingEventArgs ruleEventArgs)
         {
             RuleCheckedEvent?.Invoke(this, ruleEventArgs);
+        }
+
+        protected virtual void OnRaiseFileAlreadyExistsEvent(MovingEventArgs ruleEventArgs)
+        {
+            FileAlreadyExistsEvent?.Invoke(this, ruleEventArgs);
         }
     }
 }

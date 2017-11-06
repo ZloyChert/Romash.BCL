@@ -61,6 +61,15 @@ namespace ConsoleUI.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Sorry, but file already exists.
+        /// </summary>
+        internal static string FileExists {
+            get {
+                return ResourceManager.GetString("FileExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на File found:.
         /// </summary>
         internal static string FileFound {

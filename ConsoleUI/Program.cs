@@ -23,6 +23,7 @@ namespace ConsoleUI
             fw.FileFoundEvent += (sender, eventArgs) => Console.WriteLine($@"{messages.FileFound} {eventArgs.FileName}");
             fw.FileMovedEvent += (sender, eventArgs) => Console.WriteLine($@"{messages.FileMoved} {eventArgs.Directory}");
             fw.RuleCheckedEvent += (sender, eventArgs) => Console.WriteLine($@"{messages.RuleMatch} {eventArgs.IsMatched}");
+            fw.FileAlreadyExistsEvent += (sender, eventArgs) => Console.WriteLine($@"{messages.FileExists} {eventArgs.Directory}");
             fw.StartWatch();
             Console.Read();
         }
